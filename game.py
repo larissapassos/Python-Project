@@ -11,6 +11,7 @@ class Movement(object):
                         p.rect.left=p.rect.left-p.velocity
                 else:
                         p.rect.left=0
+                # Draw paddle after movement
                 s.blit(p.surface,p.rect)
                                         
         def move_paddle_right(s,p):
