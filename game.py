@@ -1,7 +1,7 @@
 import pygame,sys
 import time
 import game_elements
-from game_elements import Level
+from game_elements import Level, menu
 
 width, height = 640, 480
 
@@ -25,7 +25,20 @@ class Movement(object):
             # Draw paddle after movement
             surface.blit(paddle.surface, paddle.rect)
 
-        touch_paddle=False
+    
+    touch_paddle = False
+
+    def died(ball):
+        if ball.rect.bottom > height:
+            return True
+        else:
+            return False
+
+    def won(level):
+        if not level.bricklist:
+            return True
+        else:
+            return False
 
     @classmethod
     def move_ball(cls, surface, ball, bricklist, paddle):                        
