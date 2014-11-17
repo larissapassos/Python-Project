@@ -33,16 +33,10 @@ class Movement(object):
         #Collision with wall
         
         if ball.rect.left < 0 or ball.rect.right > width:
-            print("collision with side walls")
-            print("velocity before: " + str(ball.velocity))
             ball.velocity[0] = - ball.velocity[0]
-            print("velocity after: " + str(ball.velocity))
             surface.blit(ball.surface,ball.rect)
         if ball.rect.top  < 0:
-            print("collision with top wall")
-            print("velocity before: " + str(ball.velocity))
             ball.velocity[1] = - ball.velocity[1]
-            print("velocity after: " + str(ball.velocity))
             surface.blit(ball.surface, ball.rect)
                                 
         #Collision with paddle
@@ -50,8 +44,6 @@ class Movement(object):
         offset_y = (ball.rect.top - paddle.rect.top)
         if (paddle.mask.overlap(ball.mask, (offset_x, offset_y)) != None):
             #Test to see if horizontal or vertical collision
-            print("collision with paddle")
-            print("velocity before: " + str(ball.velocity))
             velocity_test = (ball.velocity[0],-ball.velocity[1])
             test_rect = ball.rect.move(velocity_test)
             test_offset_x, test_offset_y = (test_rect.left - paddle.rect.left), (test_rect.top - paddle.rect.top)
@@ -61,11 +53,9 @@ class Movement(object):
                     ball.velocity[0] = -ball.velocity[0]
                     cls.touch_paddle=True
                 ball.velocity[1] = -1*abs(ball.velocity[1])
-                print("velocity after: " + str(ball.velocity))
             else:
                 #vertical collision
                 ball.velocity[1] = -1*abs(ball.velocity[1])
-                print("velocity after: " + str(ball.velocity))
             surface.blit(ball.surface, ball.rect)
         elif (abs(ball.rect.left - paddle.rect.left) > 100):
             cls.touch_paddle = False
@@ -74,17 +64,13 @@ class Movement(object):
         for (ind,l) in enumerate(bricklist):
             offset_x, offset_y = (ball.rect.left - l.rect.left), (ball.rect.top - l.rect.top)
             if (l.mask.overlap(ball.mask, (offset_x, offset_y)) != None):
-                print("collision with brick")
-                print("velocity before: " + str(ball.velocity))
                 velocity_test = (ball.velocity[0],-ball.velocity[1])
                 test_rect = ball.rect.move(velocity_test)
                 test_offset_x, test_offset_y = (test_rect.left - l.rect.left), (test_rect.top - l.rect.top)
                 if (l.mask.overlap(ball.mask, (test_offset_x, test_offset_y)) != None):
                     ball.velocity[0] = -ball.velocity[0]
-                    print("velocity after: " + str(ball.velocity))
                 else:
                     ball.velocity[1] = -ball.velocity[1]
-                    print("velocity after: " + str(ball.velocity))
                 l.resistance = l.resistance-1                                        
                 if(l.resistance==0):
                     del bricklist[ind]    
