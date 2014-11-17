@@ -10,6 +10,7 @@ screen_width, screen_height = 640, 480
 init()
 clock = time.Clock()
 screen = display.set_mode([screen_width, screen_height])
+max_level = 5
 
 def blit_all_but_ball(lv):
     # Update screen
@@ -17,6 +18,17 @@ def blit_all_but_ball(lv):
     screen.blit(lv.paddle.surface,lv.paddle.rect)
     for l in lv.bricklist:
         screen.blit(l.surface,l.rect)
+
+def get_resistance(filename):
+    resist = []
+    f = open(filename, 'r')
+    for line in f:
+        row = []
+        list_resists = line.split(' ')
+        for r in list_resists:
+            row.append(int(r))
+        resist.append(row)
+    return resist
 
 def start_menu():
     screen.fill(black)
@@ -36,7 +48,7 @@ def start_menu():
     while resp == "re-show":
         resp = menu(**menu1)[0]
     if resp == 'PLAY':
-        game()
+        game(1)
 
     if resp == 'EXIT':
         quit()
@@ -83,48 +95,47 @@ def die_menu():
     while resp == "re-show":
         resp = menu(**menu1)[0]
     if resp == 'NEW GAME':
-        game()
+        game(1)
     if resp == 'EXIT':
         quit()
         sys.exit()
 
-def won_menu():
+def won_menu(level):
     screen.fill(black)
     font.init()
     f = font.Font('resources/airstrip.ttf', 45)
     f1 = font.Font('resources/airstrip.ttf', 25)
     f2 = font.Font('resources/airstrip.ttf', 15)
-    mainmenu = f.render('YOU WON!', 1, blue)
+    if level < max_level:
+        mainmenu = f.render('LEVEL COMPLETED', 1, blue)
+    else:
+        mainmenu = f.render('YOU WON!', 1, blue)
     r = mainmenu.get_rect()
     r.centerx, r.top = 320, 120
     screen.blit(mainmenu, r)
     display.flip()
 
-    menu1 = {"menu": ['NEW GAME', 'EXIT'], "font1": f1, "pos": 'center', "color1": blue, "light": 6}
+    if level < max_level:
+        menu1 = {"menu": ['NEXT LEVEL', 'EXIT'], "font1": f1, "pos": 'center', "color1": blue, "light": 6}
+    else:
+        menu1 = {"menu": ['NEW GAME', 'EXIT'], "font1": f1, "pos": 'center', "color1": blue, "light": 6}
 
     resp = "re-show"
     while resp == "re-show":
         resp = menu(**menu1)[0]
+    if resp == 'NEXT LEVEL':
+        game(level + 1)
     if resp == 'NEW GAME':
-        game()
+        game(1)
     if resp == 'EXIT':
         quit()
         sys.exit()
 
-def game():
-    resist = [ [0,0,1,1,1,1,1,1,1,1,1,1,1,1,0,0 ],\
-              [0,0,0,1,2,2,2,2,2,2,2,2,1,0,0,0 ],\
-              [0,0,0,0,1,3,3,3,3,3,3,1,0,0,0,0 ],\
-              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 ],\
-              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 ]]
+def game(level_number):
+    filename = "resources/level" + str(level_number)
+    resist = get_resistance(filename)
     
-    color= [ [0,0,'O','O','O','O','O','O','O','O','O','O','O','O',0,0 ],\
-              [0,0,0,'O','W','W','W','W','W','W','W','W','O',0,0,0 ],\
-              [0,0,0,0,'O','M','M','M','M','M','M','O',0,0,0,0 ],\
-              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 ],\
-              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 ]]
-
-    lv = Level(resist,color,[0,0])
+    lv = Level(resist,[0,0], level_number)
 
     screen.fill(black)
     screen.blit(lv.paddle.surface,lv.paddle.rect)
@@ -144,7 +155,8 @@ def game():
         elif k[K_RIGHT]:
             Movement.move_paddle_right(screen,lv.paddle)
         elif k[K_SPACE]:
-            lv.ball.velocity = [-1,-1]
+            v = 0.5 + (0.5 * lv.number)
+            lv.ball.velocity = [-v,v]
             break;
         lv.ball.rect.bottom = lv.paddle.rect.top
         lv.ball.rect.centerx = lv.paddle.rect.centerx
@@ -166,11 +178,13 @@ def game():
             Movement.move_paddle_right(screen,lv.paddle)
         elif k[K_ESCAPE]:
             pause_menu()
+        elif k[K_m]:
+            lv.bricklist = []
         Movement.move_ball(screen,lv.ball,lv.bricklist,lv.paddle)
         if Movement.died(lv.ball):
             die_menu()
         if Movement.won(lv):
-            won_menu()       
+            won_menu(lv.number)       
         display.update()
         clock.tick(200)
     

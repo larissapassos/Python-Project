@@ -25,36 +25,36 @@ class Paddle(object):
         self.velocity = v
 
 class Brick(object):
-    def __init__(self,i,j,r,c):
-        self.surface = self.getsurface(c)
+    def __init__(self,i,j,r):
+        self.surface = self.getsurface(r)
         self.surface.set_colorkey(white)
         self.rect = self.surface.get_rect()
         self.mask = pygame.mask.from_surface(self.surface)
         self.rect.left = j
         self.rect.top = i
         self.resistance = r
-        self.color = c
 
-    def getsurface(self,c):
+    def getsurface(self,r):
         # Create the brick surface
         a = pygame.Surface((40,20))
         a.fill((0,0,0))
-        if(c == 'O'): #ORANGE
+        if(r == 1): #ORANGE
             pygame.draw.rect(a,(255,215,0),pygame.Rect(a.get_rect().top+1,a.get_rect().left+1,38,18))
-        elif(c == 'W'): #WOOD
+        elif(r == 2): #WOOD
             pygame.draw.rect(a,(184,134,11),pygame.Rect(a.get_rect().top+1,a.get_rect().left+1,38,18))
-        elif(c == 'M'): #METAL
+        elif(r == 3): #METAL
             pygame.draw.rect(a,(192,192,192),pygame.Rect(a.get_rect().top+1,a.get_rect().left+1,38,18))
         return a
         
 
 class Level(object):
-    def __init__(self,resist,color,v): #resist  =  matrix 5 rows 16 columns
+    def __init__(self,resist,v, number): #resist  =  matrix 5 rows 16 columns
+        self.number = number
         self.bricklist = []
         for i in range(0,5):
             for j in range(0,16):
                 if(resist[i][j] != 0):
-                    b = Brick(i * 20, j * 40, resist[i][j], color[i][j])
+                    b = Brick(i * 20, j * 40, resist[i][j])
                     self.bricklist.append(b)
         self.paddle = Paddle(460,320,2)                                      
         self.ball = Ball(460 - self.paddle.rect.h,320,v)
@@ -114,7 +114,7 @@ def menu(menu, pos='center', font1=None, color1=(128, 128, 128), interline=5, ju
         for i in menu:
             i.centerx = r1.centerx
 
-    idx = -1
+    idx = 0
     display.set_caption("BREAKYTHON")
     show()
 
