@@ -10,15 +10,16 @@ screen_width, screen_height = 640, 480
 init()
 clock = time.Clock()
 screen = display.set_mode([screen_width, screen_height])
-max_level = 5
+max_level = 5 # Maximum number of levels. can be adjusted.
 
+# Update screen using pygame routines
 def blit_all_but_ball(lv):
-    # Update screen
     screen.fill(black)
     screen.blit(lv.paddle.surface,lv.paddle.rect)
     for l in lv.bricklist:
         screen.blit(l.surface,l.rect)
 
+# Returns the brick list with resistances
 def get_resistance(filename):
     resist = []
     f = open(filename, 'r')
@@ -30,12 +31,17 @@ def get_resistance(filename):
         resist.append(row)
     return resist
 
+# Builds starting menu
 def start_menu():
     screen.fill(black)
     font.init()
+
+    # Load fonts from resources
     f = font.Font('resources/airstrip.ttf', 45)
     f1 = font.Font('resources/airstrip.ttf', 25)
     f2 = font.Font('resources/airstrip.ttf', 15)
+
+    # Render menu
     mainmenu = f.render('BREAKYTHON', 1, blue)
     r = mainmenu.get_rect()
     r.centerx, r.top = 320, 120
@@ -54,12 +60,17 @@ def start_menu():
         quit()
         sys.exit()
 
+# Renders paused game menu
 def pause_menu():
     screen.fill(black)
     font.init()
+
+    # Loads fonts from resources
     f = font.Font('resources/airstrip.ttf', 45)
     f1 = font.Font('resources/airstrip.ttf', 25)
     f2 = font.Font('resources/airstrip.ttf', 15)
+
+    # Render menu
     mainmenu = f.render('PAUSE', 1, blue)
     r = mainmenu.get_rect()
     r.centerx, r.top = 320, 120
@@ -77,12 +88,17 @@ def pause_menu():
         quit()
         sys.exit()
 
+# Renders lost game menu
 def die_menu():
     screen.fill(black)
+
+    # Loads fonts from resources
     font.init()
     f = font.Font('resources/airstrip.ttf', 45)
     f1 = font.Font('resources/airstrip.ttf', 25)
     f2 = font.Font('resources/airstrip.ttf', 15)
+
+    # Render menu
     mainmenu = f.render('GAME OVER', 1, blue)
     r = mainmenu.get_rect()
     r.centerx, r.top = 320, 120
@@ -100,12 +116,17 @@ def die_menu():
         quit()
         sys.exit()
 
+# Renders won game menu
 def won_menu(level):
     screen.fill(black)
+
+    # Loads fonts from resources
     font.init()
     f = font.Font('resources/airstrip.ttf', 45)
     f1 = font.Font('resources/airstrip.ttf', 25)
     f2 = font.Font('resources/airstrip.ttf', 15)
+
+    # Checks if the user completed the last level
     if level < max_level:
         mainmenu = f.render('LEVEL COMPLETED', 1, blue)
     else:
@@ -131,7 +152,10 @@ def won_menu(level):
         quit()
         sys.exit()
 
+# Creates a new gane level
 def game(level_number):
+
+    # Loads level form resources
     filename = "resources/level" + str(level_number)
     resist = get_resistance(filename)
     
@@ -144,6 +168,7 @@ def game(level_number):
         screen.blit(l.surface,l.rect)
     display.update()
 
+    # First main loop: waits until user decides where to launch ball
     while True:
         for e in event.get():
             if e.type == QUIT:
@@ -165,6 +190,9 @@ def game(level_number):
         display.update()
         clock.tick(200)
     
+    # Second main loop: keeps updating ball and paddle position
+    # as well as the brick list. Continuously checks if user has
+    # lost or won the level.
     while True:
         for e in event.get():
             if e.type == QUIT:
@@ -178,8 +206,6 @@ def game(level_number):
             Movement.move_paddle_right(screen,lv.paddle)
         elif k[K_ESCAPE]:
             pause_menu()
-        elif k[K_m]:
-            lv.bricklist = []
         Movement.move_ball(screen,lv.ball,lv.bricklist,lv.paddle)
         if Movement.died(lv.ball):
             die_menu()
@@ -188,6 +214,5 @@ def game(level_number):
         display.update()
         clock.tick(200)
     
-        
 if __name__=="__main__":
     start_menu()
